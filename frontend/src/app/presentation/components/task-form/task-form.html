@@ -1,0 +1,25 @@
+<form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="mb-8">
+  <div
+    class="flex flex-col gap-2 rounded-full border border-white/10 bg-black/40 p-2 backdrop-blur-xl sm:flex-row sm:items-center"
+  >
+    <input
+      type="text"
+      formControlName="title"
+      maxlength="180"
+      placeholder="¿Qué necesitas hacer hoy?"
+      class="w-full flex-1 bg-transparent px-5 py-3 text-white placeholder:text-slate-500 focus:outline-none"
+    />
+    <button
+      type="submit"
+      [disabled]="taskForm.invalid"
+      class="rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      Añadir
+    </button>
+  </div>
+  @if (taskForm.controls.title.invalid && taskForm.controls.title.touched) {
+    <div class="animate-fade-in mt-3 px-3 text-sm text-rose-300">
+      La tarea debe tener al menos 3 caracteres.
+    </div>
+  }
+</form>

@@ -1,0 +1,73 @@
+<div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:py-14">
+  <header class="animate-rise mb-10 text-center">
+    <p class="mb-4 text-xs font-medium tracking-[0.18em] text-violet-300 uppercase">
+      {{ '{' }} GESTOR DE TAREAS CON BACKEND {{ '}' }}
+    </p>
+    <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
+      Organiza tus <span class="text-violet-400">tareas</span>.
+    </h1>
+    <p class="mx-auto mt-4 max-w-2xl text-base text-slate-400 sm:text-lg">
+      Crea, completa y elimina con
+      <span class="font-medium text-lime">criterio de producto</span>, no con una lista suelta.
+    </p>
+  </header>
+
+  <div
+    class="mb-8 grid gap-3 rounded-full border border-white/10 bg-black/35 px-5 py-3 text-sm text-slate-300 backdrop-blur-xl sm:grid-cols-3"
+  >
+    <div class="flex items-center justify-center gap-2">
+      <span class="h-2 w-2 rounded-full bg-violet-400"></span>
+      {{ taskService.pendingTasks() }} pendientes
+    </div>
+    <div class="flex items-center justify-center gap-2">
+      <span class="h-2 w-2 rounded-full bg-lime"></span>
+      {{ taskService.completedTasks() }} completadas
+    </div>
+    <div class="flex items-center justify-center gap-2">
+      <span class="h-2 w-2 rounded-full bg-indigo-400"></span>
+      {{ taskService.progress() }}% progreso
+    </div>
+  </div>
+
+  <!-- El form solo emite el título; addTask() hace POST al backend -->
+  <app-task-form (taskCreated)="taskService.addTask($event)" />
+
+  @if (taskService.error()) {
+    <div class="mb-5 rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+      {{ taskService.error() }}
+      <button class="ml-2 font-semibold text-white underline" type="button" (click)="taskService.load()">
+        Reintentar
+      </button>
+    </div>
+  }
+
+  @if (taskService.loading()) {
+    <div class="space-y-3">
+      @for (skeleton of [1, 2, 3]; track skeleton) {
+        <div class="h-16 animate-pulse rounded-2xl bg-white/5"></div>
+      }
+    </div>
+  } @else {
+    <div class="space-y-3">
+      @for (task of taskService.tasks(); track task.id) {
+        <!-- Cada evento de la card dispara el HTTP correspondiente en TaskService -->
+        <app-task-card
+          [task]="task"
+          [busy]="taskService.busyId() === task.id"
+          (toggleCompletion)="taskService.toggleTask($event)"
+          (deleteTask)="taskService.deleteTask($event)"
+          (titleUpdated)="taskService.updateTitle(task.id, $event)"
+        />
+      } @empty {
+        <div
+          class="animate-rise rounded-3xl border border-white/10 bg-black/30 px-6 py-16 text-center backdrop-blur-xl"
+        >
+          <h3 class="text-xl font-semibold text-white">No hay tareas todavía</h3>
+          <p class="mx-auto mt-2 max-w-md text-sm text-slate-400">
+            Escribe un título arriba y pulsa Añadir para crear la primera.
+          </p>
+        </div>
+      }
+    </div>
+  }
+</div>
